@@ -6,10 +6,10 @@
  */
 namespace onmotion\telegram\Commands;
 
+use Longman\TelegramBot\Entities\InlineKeyboard;
 use onmotion\telegram\models\AuthorizedManagerChat;
 use onmotion\telegram\models\Message;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
-use Longman\TelegramBot\Entities\InlineKeyboardMarkup;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use yii\base\UserException;
@@ -41,7 +41,7 @@ class YiiChatCommand
             $message->time = date("Y-m-d H:i:s", time());
             $isSaved = $message->save();
         } catch (\Exception $e){
-            var_dump('error saving to db');
+            Yii::error($e->getMessage(), __METHOD__);
             //continue anyway
         }
         //проверяем ведется ли уже диалог
@@ -59,7 +59,7 @@ class YiiChatCommand
                     AuthorizedManagerChat::updateAll(['client_chat_id' => null], ['<', 'timestamp', 'now() - 60 * ' . $timeBeforeResetChatHandler]);
                 }
             }catch (\Exception $e){
-                var_dump($e->getMessage());
+                Yii::error($e->getMessage(), __METHOD__);
             }
             //если нет то шлем всем свободным
             $authChats = AuthorizedManagerChat::find()->where(['client_chat_id' => null])->all();
@@ -83,8 +83,9 @@ class YiiChatCommand
                 $inline_keyboard = [
                     new InlineKeyboardButton(['text' => Yii::t('tlgrm', 'Start conversation'), 'callback_data' => 'client_chat_id ' . $tlgrmChatId]),
                 ];
-                $data['reply_markup'] = new InlineKeyboardMarkup(
-                    ['inline_keyboard' => [$inline_keyboard]]);
+                $data['reply_markup'] = new InlineKeyboard(
+                    ['inline_keyboard' => [$inline_keyboard]]
+                );
                 Request::sendMessage($data);
             }
         }

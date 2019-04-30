@@ -19,16 +19,15 @@ use Yii;
  */
 class HelpCommand extends UserCommand
 {
-    /**#@+
+    /**
      * {@inheritdoc}
      */
     protected $name = 'help';
     protected $description = '';
     protected $usage = '/help or /help <command>';
     protected $version = '1.0.1';
-    /**#@-*/
 
-    public function __construct($telegram, $update = NULL)
+    public function __construct($telegram, $update = null)
     {
         $this->description = \Yii::t('tlgrm', 'Show bot commands help');
         parent::__construct($telegram, $update);
@@ -52,7 +51,7 @@ class HelpCommand extends UserCommand
 
         //If no command parameter is passed, show the list
         if ($command === '') {
-            $text = $this->telegram->getBotName() . ' v. ' . $this->telegram->getVersion() . "\n\n";
+            $text = $this->telegram->getBotUsername() . ' v. ' . $this->telegram->getVersion() . "\n\n";
             $text .= 'Commands List:' . "\n";
             foreach ($commands as $command) {
                 $text .= '/' . $command->getName() . ' - ' . $command->getDescription() . "\n";
@@ -72,9 +71,9 @@ class HelpCommand extends UserCommand
         }
 
         $data = [
-            'chat_id'             => $chat_id,
+            'chat_id' => $chat_id,
             'reply_to_message_id' => $message_id,
-            'text'                => $text,
+            'text' => $text,
         ];
 
         return Request::sendMessage($data);

@@ -13,6 +13,7 @@ use yii\base\UserException;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
+use Yii;
 
 define('API_KEY', \Yii::$app->modules['telegram']->API_KEY);
 define('BOT_NAME', \Yii::$app->modules['telegram']->BOT_NAME);
@@ -41,10 +42,11 @@ class DefaultController extends Controller
     }
 
     public function beforeAction($action)
-    {            
+    {
         if ($action->id == 'hook') {
             $this->enableCsrfValidation = false;
         }
+
         return parent::beforeAction($action);
     }
 
@@ -52,10 +54,11 @@ class DefaultController extends Controller
     {
         return $this->renderPartial('button');
     }
+
     public function actionInitChat()
     {
         $session = \Yii::$app->session;
-        if(!$session->has('tlgrm_chat_id')) {
+        if (!$session->has('tlgrm_chat_id')) {
             if (isset($_COOKIE['tlgrm_chat_id'])) {
                 $tlgrmChatId = $_COOKIE['tlgrm_chat_id'];
                 $session->set('tlgrm_chat_id', $tlgrmChatId);
@@ -65,33 +68,42 @@ class DefaultController extends Controller
                 setcookie("tlgrm_chat_id", $tlgrmChatId, time() + 1800);
             }
         }
+
         return $this->renderPartial('chat');
     }
 
-    public function actionSetWebhook(){
+    public function actionSetWebhook()
+    {
         try {
             // Create Telegram API object
             $telegram = new Telegram(API_KEY, BOT_NAME);
 
-            if (!empty(\Yii::$app->modules['telegram']->userCommandsPath)){
-                if(!$commandsPath = realpath(\Yii::getAlias(\Yii::$app->modules['telegram']->userCommandsPath))){
+            if (!empty(\Yii::$app->modules['telegram']->userCommandsPath)) {
+                if (!$commandsPath = realpath(\Yii::getAlias(\Yii::$app->modules['telegram']->userCommandsPath))) {
                     $commandsPath = realpath(\Yii::getAlias('@app') . \Yii::$app->modules['telegram']->userCommandsPath);
                 }
-                if(!is_dir($commandsPath)) throw new UserException('dir ' . \Yii::$app->modules['telegram']->userCommandsPath . ' not found!');
+                if (!is_dir($commandsPath)) {
+                    throw new UserException('dir ' . \Yii::$app->modules['telegram']->userCommandsPath . ' not found!');
+                }
             }
-            
+
             // Set webhook
             $result = $telegram->setWebHook(hook_url);
             if ($result->isOk()) {
                 echo $result->getDescription();
             }
         } catch (TelegramException $e) {
-            echo $e->getMessage();
+            Yii::error($e->getMessage(), __METHOD__);
         }
+
         return null;
     }
-    public function actionUnsetWebhook(){
-        if (\Yii::$app->user->isGuest) throw new ForbiddenHttpException();
+
+    public function actionUnsetWebhook()
+    {
+        if (\Yii::$app->user->isGuest) {
+            throw new ForbiddenHttpException();
+        }
         try {
             // Create Telegram API object
             $telegram = new Telegram(API_KEY, BOT_NAME);
@@ -103,11 +115,12 @@ class DefaultController extends Controller
                 echo $result->getDescription();
             }
         } catch (TelegramException $e) {
-            echo $e->getMessage();
+            Yii::error($e->getMessage(), __METHOD__);
         }
     }
 
-    public function actionHook(){
+    public function actionHook()
+    {
         try {
             // Create Telegram API object
             $telegram = new Telegram(API_KEY, BOT_NAME);
@@ -115,8 +128,8 @@ class DefaultController extends Controller
 //            $commandsPath = realpath($basePath . '/Commands/SystemCommands');
             $commandsPath = realpath($basePath . '/Commands/UserCommands');
             $telegram->addCommandsPath($commandsPath);
-            if (!empty(\Yii::$app->modules['telegram']->userCommandsPath)){
-                if(!$commandsPath = realpath(\Yii::getAlias(\Yii::$app->modules['telegram']->userCommandsPath))){
+            if (!empty(\Yii::$app->modules['telegram']->userCommandsPath)) {
+                if (!$commandsPath = realpath(\Yii::getAlias(\Yii::$app->modules['telegram']->userCommandsPath))) {
                     $commandsPath = realpath(\Yii::getAlias('@app') . \Yii::$app->modules['telegram']->userCommandsPath);
                 }
                 $telegram->addCommandsPath($commandsPath);
@@ -126,8 +139,9 @@ class DefaultController extends Controller
         } catch (TelegramException $e) {
             // Silence is golden!
             // log telegram errors
-            var_dump($e->getMessage());
+            Yii::error($e->getMessage(), __METHOD__);
         }
+
         return null;
     }
 }

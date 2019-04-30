@@ -1,8 +1,15 @@
 {
-  "name": "onmotion/yii2-telegram",
+  "name": "maxodrom/yii2-telegram",
   "description": "Support chat for site based on Telegram bot",
   "type": "yii2-extension",
-  "keywords": ["yii2","extension","module","chat", "telegram", "bot"],
+  "keywords": [
+    "yii2",
+    "extension",
+    "module",
+    "chat",
+    "telegram",
+    "bot"
+  ],
   "license": "MIT",
   "authors": [
     {
@@ -10,12 +17,17 @@
       "email": "onmotion1@gmail.com",
       "homepage": "http://kozhevnikov.me",
       "role": "Developer"
+    },
+    {
+      "name": "Max Alexandrov",
+      "email": "max@7u3.ru",
+      "role": "Developer"
     }
   ],
   "require": {
-    "php": ">=5.5.0",
-    "yiisoft/yii2": ">=2.0.1",
-    "longman/telegram-bot": "^0.35.0"
+    "php": ">=7.0",
+    "yiisoft/yii2": "~2.0.0",
+    "longman/telegram-bot": "~0.56.0"
   },
   "autoload": {
     "psr-4": {

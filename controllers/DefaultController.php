@@ -109,7 +109,7 @@ class DefaultController extends Controller
             $telegram = new Telegram(API_KEY, BOT_NAME);
 
             // Unset webhook
-            $result = $telegram->unsetWebHook();
+            $result = $telegram->deleteWebhook();
 
             if ($result->isOk()) {
                 echo $result->getDescription();
